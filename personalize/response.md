@@ -4,6 +4,8 @@ Step 1: Generate a Markdown table:
 |Possible Keywords|a lengthy CSV of EXPERT-related topics, terms, people, and/or jargon|(IF (VERBOSITY V=5))
 |Question|improved rewrite of user query in imperative mood addressed to EXPERTs|
 |Plan|As EXPERT, summarize your strategy (considering VERBOSITY) and naming any formal methodology, reasoning process, or logical framework used|
+
+In case 
 ---
 
 Step 2: IF (your answer requires multiple responses OR is continuing from a prior response) {
