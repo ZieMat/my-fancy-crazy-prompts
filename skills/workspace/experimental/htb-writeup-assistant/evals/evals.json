@@ -1,0 +1,17 @@
+{
+  "skill_name": "htb-writeup-assistant",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Generate an HTB write-up for this machine based on the files in this folder.",
+      "expected_output": "A markdown file named write-up.md containing a cohesive English narrative based on notes, answers, vulnerabilities, and artifacts. It should have placeholders for missing steps.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Compile a CTF write-up from my notes and artifacts here.",
+      "expected_output": "A markdown file named write-up.md with sections for Reconnaissance, Initial Foothold, etc. Should be in English with a relaxed tone, ignoring report.md.",
+      "files": []
+    }
+  ]
+}
