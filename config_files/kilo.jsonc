@@ -1,0 +1,38 @@
+{
+    "$schema": "https://kilo.ai/config.json",
+    "enabled_providers": ["llm-proxy-4-code", "openrama"],
+    "disabled_providers": ["openai", "anthropic", "gemini", "openrouter"],
+    "provider": {
+      "llm-proxy-4-code": {
+        "npm": "@ai-sdk/openai-compatible",
+        "name": "llm-proxy-4-code",
+        "options": {
+          "baseURL": "<openai-compatible-api-url>"
+        },
+        // Adjust the list to your models
+        "models": {
+          "openai/omni-moderation-latest": {
+            "name": "openai/omni-moderation-latest"
+          },
+          "openai/gpt-5.1-codex": {
+            "name": "openai/gpt-5.1-codex"
+          },
+          "openai/gpt-5.1-codex-max": {
+            "name": "openai/gpt-5.1-codex-max"
+          },
+          "openai/gpt-5.2-codex": {
+            "name": "openai/gpt-5.2-codex"
+          },
+          "openai/gpt-5.2": {
+            "name": "openai/gpt-5.2"
+          },
+          "openai/gpt-5": {
+            "name": "openai/gpt-5"
+          },
+          "openai/gpt-5-mini": {
+            "name": "openai/gpt-5-mini"
+          }
+        }
+      }
+    }
+  }

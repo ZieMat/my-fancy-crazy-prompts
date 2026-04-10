@@ -1,0 +1,45 @@
+{
+  "skill_name": "python-project-setup",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create a new Python project named `acme-service` using uv with Python 3.11. Package should be `acme`, no framework. Include git init, .gitignore, .env/.env.example, README, AGENTS.md, workflows folder, agents/skills folder, pyproject with ruff/ty/pytest. Show the next commands to run.",
+      "expected_output": "Project scaffold with uv+git init, env/ignore files, docs, src/acme package, tests, agents/skills + workflows folders, pyproject configured with ruff/ty/pytest, plus usage notes.",
+      "files": [],
+      "assertions": [
+        {"name": "git_initialized", "text": "Output mentions git init or indicates repo initialized."},
+        {"name": "pyproject_tools", "text": "pyproject lists ruff, ty, pytest, python-dotenv (dev/optional)."},
+        {"name": "env_files", "text": "Creates both .env and .env.example with guidance and no secrets."},
+        {"name": "agents_workflows_dirs", "text": "Creates agents/skills/ and workflows/ with brief README or note."},
+        {"name": "package_layout", "text": "Creates src/acme with __init__.py and __main__.py plus tests/test_smoke.py."},
+        {"name": "commands_listed", "text": "Provides next commands (uv sync/run pytest)."}
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Initialize a FastAPI-based project named `notifier-api` (package `notifier`) using uv and Python 3.12. Add FastAPI and uvicorn dependencies, include git, .gitignore, env files, README/AGENTS, workflows folder, agents/skills folder, pyproject with ruff/ty/pytest and FastAPI config. Add a minimal FastAPI app stub and document run command.",
+      "expected_output": "Scaffolded uv project with FastAPI deps, FastAPI app stub, uvicorn run instructions, standard files/folders, tooling configured.",
+      "files": [],
+      "assertions": [
+        {"name": "fastapi_deps", "text": "pyproject adds fastapi and uvicorn (standard extras)."},
+        {"name": "fastapi_stub", "text": "Creates src/notifier/app.py (or similar) with FastAPI app and health route."},
+        {"name": "run_command", "text": "README documents uvicorn run command using uv run."},
+        {"name": "tooling_present", "text": "ruff, ty, pytest, python-dotenv included in deps and configured."},
+        {"name": "structure_complete", "text": "Env files, git init, agents/skills, workflows, tests present."}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Set up a CLI-oriented project `data-tools` (package `datatools`) with Typer on Python 3.10 using uv. Include git init, .gitignore, env files, README/AGENTS, workflows, agents/skills, pyproject with ruff/ty/pytest and Typer. Add a simple Typer CLI entrypoint and smoke test.",
+      "expected_output": "uv project with Typer CLI stub, smoke test, standard scaffolding, tooling deps added.",
+      "files": [],
+      "assertions": [
+        {"name": "typer_dep", "text": "pyproject includes typer (and rich/click if desired via typer)."},
+        {"name": "cli_stub", "text": "Creates Typer CLI entrypoint (e.g., src/datatools/cli.py) wired in __main__.py."},
+        {"name": "smoke_test", "text": "tests/test_smoke.py imports package/cli without errors."},
+        {"name": "scaffolding_complete", "text": "git init, env files, agents/skills, workflows, README/AGENTS present; pyproject contains ruff, ty, pytest, python-dotenv."},
+        {"name": "commands_listed", "text": "README shows uv sync, uv run cli invocation, uv run pytest."}
+      ]
+    }
+  ]
+}

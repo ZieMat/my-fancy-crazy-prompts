@@ -1,0 +1,7 @@
+{
+  "disabled": true,
+  "timeout": 60,
+  "type": "stdio",
+  "command": "drawio-mcp",
+  "args": []
+}

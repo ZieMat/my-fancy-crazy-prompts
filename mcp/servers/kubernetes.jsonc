@@ -1,0 +1,14 @@
+{
+  "disabled": true,
+  "timeout": 60,
+  "type": "stdio",
+  "command": "docker",
+  "args": [
+    "run",
+    "-i",
+    "--rm",
+    "-v",
+    "<host-path>:<container-path>", // i.e /host/project/path:/container/project/path:ro
+    "/mcp/kubernetes" // Docker image
+  ]
+}
