@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(nmap.org)",
+      "WebFetch(blog.cyberdesserts.com)",
+      "Bash(mkdir *)",
+      "Bash(nmap *)",
+      "Bash(python3 *)",
+      "Bash(date *)",
+      "Bash(cp *)"
+    ]
+  },
+  "$version": 3
+}

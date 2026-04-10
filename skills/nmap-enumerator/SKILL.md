@@ -47,17 +47,59 @@ Parse the output to extract the list of open ports. If no ports are open, report
 
 ## Phase 2: Adaptive service + script scan
 
-Using only the discovered open ports, construct a targeted follow-up scan:
+Using only the discovered open ports, construct **granular, per-service follow-up scans**. Instead of running all NSE scripts in one massive command, execute separate targeted scans for each detected service. This prevents timeouts, reduces resource exhaustion, and provides better visibility into which scripts succeed or fail.
+
+### Phase 2a: Service and version detection
+
+First, run a service detection scan to identify what's running on each port:
 
 **CLI form:**
 ```bash
-nmap -sV -O --osscan-limit -p <comma_separated_open_ports> \
-  --script "<dynamically_built_script_list>" \
-  --script-args safe=1 \
-  -oA scans/detailed <target>
+nmap -sV -O --osscan-limit -p <comma_separated_open_ports> -oA scans/services <target>
 ```
 
-**MCP form:** Pass the same parameters (`ports`, `scripts`, `service_detection`, `os_detection`) to the equivalent MCP tool call.
+**MCP form:** Pass the same parameters (`ports`, `service_detection`, `os_detection`) to the equivalent MCP tool call.
+
+Parse the output to map each open port to its detected service type (e.g., port 22 → SSH, port 80 → HTTP, port 443 → HTTPS/SSL).
+
+### Phase 2b: Granular per-service script enumeration
+
+For **each detected service**, run a targeted NSE script scan. Execute these scans **sequentially or in small parallel batches** (max 2-3 concurrent scans) to avoid overwhelming the target or the scanning system.
+
+**CLI form (per service):**
+```bash
+nmap -p <port> -sV --script "<service_specific_scripts>" \
+  --script-args safe=1 \
+  --host-timeout 5m --script-timeout 3m \
+  -oA scans/scripts_<port> <target>
+```
+
+**Example: If ports 22, 80, and 443 are open, run THREE separate commands:**
+```bash
+# SSH enumeration (port 22)
+nmap -p 22 -sV --script "ssh-auth-methods,ssh2-enum-algos" \
+  --script-args safe=1 --host-timeout 5m --script-timeout 3m \
+  -oA scans/scripts_22 <target>
+
+# HTTP enumeration (port 80)
+nmap -p 80 -sV --script "http-title,http-server-header,http-headers,http-methods,http-robots.txt,http-enum,http-security-headers,http-waf-detect" \
+  --script-args safe=1 --host-timeout 5m --script-timeout 3m \
+  -oA scans/scripts_80 <target>
+
+# HTTPS + SSL enumeration (port 443)
+nmap -p 443 -sV --script "http-title,http-server-header,http-headers,http-methods,http-robots.txt,http-enum,http-security-headers,http-waf-detect,ssl-enum-ciphers,ssl-cert,ssl-heartbleed,ssl-date" \
+  --script-args safe=1 --host-timeout 5m --script-timeout 3m \
+  -oA scans/scripts_443 <target>
+```
+
+**MCP form:** Make separate tool calls for each port with `port`, `scripts`, and `service_detection` parameters.
+
+### Execution strategy
+
+- **Sequential execution**: Run one port's script scan at a time (safest, easiest to track)
+- **Small batch parallel**: Run 2-3 port scans simultaneously if the target can handle it (use background processes with `&` and `wait`)
+- **Track progress**: Log which port is being scanned and report results as they complete
+- **Handle failures gracefully**: If one port's scan times out or fails, continue with other ports and note the failure in the report
 
 ### Dynamic script selection
 
@@ -88,17 +130,19 @@ After building the list, deduplicate and join with commas. If no specific script
 ### Scan type adjustments
 
 - If Phase 1 used `-sS` (root), keep `-sS` in Phase 2. If it fell back to `-sT`, use `-sT` here too.
-- If the target appears to be behind a WAF/CDN (detected via `http-waf-detect` or unusual TTL/response patterns), add `--scanflags` with stealthier flags and reduce timing to `-T2`.
-- If Phase 1 shows >100 open ports (likely a honeypot or misconfigured target), limit Phase 2 to the top 50 most common service ports and note this in the report.
+- If the target appears to be behind a WAF/CDN (detected via `http-waf-detect` or unusual TTL/response patterns), add `--scanflags` with stealthier flags and reduce timing to `-T2` for subsequent per-port scans.
+- If Phase 1 shows >100 open ports (likely a honeypot or misconfigured target), limit Phase 2b script enumeration to the top 50 most common service ports and note this in the report.
+- **Timeout management**: Each per-port scan has its own `--host-timeout 5m --script-timeout 3m` to prevent any single service from blocking the entire enumeration. Adjust these values based on network latency and target responsiveness.
+- **Rate limiting**: When scanning multiple ports sequentially, add `-T3` or `-T2` between scans if the target shows signs of rate limiting or connection drops.
 
 ## Parsing results
 
-Parse the Phase 2 XML output (`scans/detailed.xml`) to extract:
+Parse the outputs from **Phase 2a (services)** and **Phase 2b (per-port scripts)** to extract:
 
-1. **Open ports** — list of port numbers with protocol (tcp/udp)
-2. **Service names and versions** — from the `<service>` elements with `name`, `product`, `version`, `extrainfo` attributes
-3. **OS fingerprint** — from the `<os>` section, extract `<osmatch name="...">` entries with accuracy scores
-4. **NSE findings** — from `<script>` elements within each `<port>`:
+1. **Open ports** — list of port numbers with protocol (tcp/udp) from `scans/services.xml` or `scans/services.gnmap`
+2. **Service names and versions** — from the `<service>` elements in `scans/services.xml` with `name`, `product`, `version`, `extrainfo` attributes
+3. **OS fingerprint** — from the `<os>` section in `scans/services.xml`, extract `<osmatch name="...">` entries with accuracy scores
+4. **NSE findings** — from `<script>` elements in each `scans/scripts_<port>.xml` file (one XML file per port):
    - `http-title`: page title
    - `http-server-header`: server version banner
    - `http-robots.txt`: disallowed entries
@@ -112,7 +156,9 @@ Parse the Phase 2 XML output (`scans/detailed.xml`) to extract:
    - `mysql-info`/`redis-info`/`mongodb-info`: service details
    - Any other script output with findings
 
-Use Python's `xml.etree.ElementTree` or `lxml` to parse the XML, or use `grep`/`awk` on the `.gnmap` file for quick extraction.
+**Iterate through all `scans/scripts_*.xml` files** to aggregate NSE findings. Use Python's `xml.etree.ElementTree` or `lxml` to parse the XML, or use `grep`/`awk` on the `.gnmap` files for quick extraction.
+
+**Track scan status**: Note which ports completed successfully, which timed out, and which failed entirely. Include this in the report's security notes.
 
 ## Micro-report generation
 
@@ -172,15 +218,29 @@ scans/
 ├── discovery.nmap
 ├── discovery.xml
 ├── discovery.gnmap
-├── detailed.nmap
-├── detailed.xml
-├── detailed.gnmap
+├── services.nmap
+├── services.xml
+├── services.gnmap
+├── scripts_22.nmap
+├── scripts_22.xml
+├── scripts_22.gnmap
+├── scripts_80.nmap
+├── scripts_80.xml
+├── scripts_80.gnmap
+├── scripts_443.nmap
+├── scripts_443.xml
+├── scripts_443.gnmap
+│   └── ... (one set per enumerated port)
 └── report.md          ← the micro-report
 ```
+
+Each `scripts_<port>.*` file contains the NSE script results for that specific port, making it easier to troubleshoot failed scans or re-run enumeration for a single service without re-scanning everything.
 
 ## Error handling
 
 - If neither an Nmap MCP tool nor the `nmap` CLI is available, tell the user they need to provide access to Nmap (install via `apt install nmap` or connect an Nmap MCP server)
-- If a scan times out (use `--host-timeout 10m --script-timeout 5m`), note the timeout and report partial results
+- If a per-port scan times out (using `--host-timeout 5m --script-timeout 3m`), note the timeout for that specific port and continue scanning other ports. Report partial results with clear notation of which ports were successfully enumerated vs. which failed
+- If a single port's script scan fails, retry once with reduced timeout (`--host-timeout 3m --script-timeout 2m`). If it still fails, skip that port and note the failure in the report
 - If output is malformed or missing, fall back to parsing whatever format is available
 - If the target is unreachable, report that clearly and suggest checking connectivity/firewall rules
+- **Partial failure recovery**: If 3 out of 5 ports are successfully enumerated, generate the report with available data and clearly mark the missing sections as "scan failed/timed out"
