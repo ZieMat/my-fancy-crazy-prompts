@@ -1,0 +1,2 @@
+Host: 192.168.1.50 ()	Status: Up
+Host: 192.168.1.50 ()	Ports: 22/open/tcp//ssh//OpenSSH 8.9p1 Ubuntu 3ubuntu0.6 (Ubuntu Linux; protocol 2.0)/, 80/open/tcp//http//nginx 1.24.0/, 443/open/tcp//ssl/http//nginx 1.24.0/, 3306/open/tcp//mysql//MySQL 8.0.36/, 8080/open/tcp//http//Apache Tomcat 10.1.18/	Ignored State: closed (65530)
