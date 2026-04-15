@@ -1,0 +1,146 @@
+# Nmap 7.98 scan initiated Sat Apr 11 14:23:10 2026 as: nmap -sV -O --osscan-limit -p 22,80,443,3306,8080 --script ssh-auth-methods,ssh2-enum-algos,http-title,http-server-header,http-headers,http-methods,http-robots.txt,http-enum,http-security-headers,http-waf-detect,ssl-enum-ciphers,ssl-cert,ssl-heartbleed,ssl-date,mysql-info,mysql-empty-password,mysql-databases --script-args safe=1 --host-timeout 10m --script-timeout 5m -oA scans/detailed 192.168.1.50
+Nmap scan report for 192.168.1.50
+Host is up (0.0031s latency).
+
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh      OpenSSH 8.9p1 Ubuntu 3ubuntu0.6 (Ubuntu Linux; protocol 2.0)
+| ssh-auth-methods: 
+|   Supported authentication methods:
+|     publickey
+|     password
+|_    keyboard-interactive
+| ssh2-enum-algos: 
+|   kex_algorithms: 
+|     curve25519-sha256
+|     diffie-hellman-group-exchange-sha256
+|     diffie-hellman-group16-sha512
+|     diffie-hellman-group18-sha512
+|   host_key_algorithms: 
+|     rsa-sha2-512
+|     rsa-sha2-256
+|     ecdsa-sha2-nistp256
+|     ssh-ed25519
+|   encryption_algorithms: 
+|     chacha20-poly1305@openssh.com
+|     aes256-gcm@openssh.com
+|     aes128-gcm@openssh.com
+|     aes256-ctr
+|     aes192-ctr
+|     aes128-ctr
+|   mac_algorithms: 
+|     hmac-sha2-256-etm@openssh.com
+|     hmac-sha2-512-etm@openssh.com
+|_    hmac-sha2-256
+80/tcp   open  http     nginx 1.24.0
+| http-security-headers: 
+|   Missing:
+|     Strict-Transport-Security
+|     Content-Security-Policy
+|     X-Frame-Options
+|     X-Content-Type-Options
+|_    Referrer-Policy
+| http-methods: 
+|   Supported Methods: GET HEAD POST OPTIONS
+|_  Potentially risky methods: OPTIONS
+| http-robots.txt: 5 disallowed entries 
+| /admin/ /backup/ /config/ /wp-admin/ 
+|_/.env
+| http-server-header: nginx/1.24.0
+| http-title: Welcome to MyApp Dashboard
+|_Requested resource was http://192.168.1.50/login
+|_http-enum: /login: Login page
+| http-headers: 
+|   Server: nginx/1.24.0
+|   Date: Sat, 11 Apr 2026 14:23:15 GMT
+|   Content-Type: text/html; charset=UTF-8
+|   Transfer-Encoding: chunked
+|   Connection: keep-alive
+|   X-Powered-By: PHP/8.2.14
+|_  Set-Cookie: session_id=abc123def456; Path=/; HttpOnly
+|_http-waf-detect: not protected by a WAF
+443/tcp  open  ssl/http nginx 1.24.0
+| ssl-cert: Subject: commonName=webapp-staging.internal/organizationName=MyApp Inc/stateOrProvinceName=California/countryName=US
+| Issuer: commonName=R3/organizationName=Let's Encrypt/countryName=US
+| Public Key type: rsa
+| Public Key bits: 2048
+| Signature Algorithm: sha256WithRSAEncryption
+| Not valid before: 2026-01-15T00:00:00
+| Not valid after:  2026-04-15T23:59:59
+| MD5:   a1b2 c3d4 e5f6 7890 a1b2 c3d4 e5f6 7890
+|_SHA-1: abcd ef01 2345 6789 abcd ef01 2345 6789 abcd ef01
+| ssl-enum-ciphers: 
+|   TLSv1.2: 
+|     ciphers: 
+|       TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+|       TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+|       TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+|       TLS_RSA_WITH_AES_128_CBC_SHA
+|       TLS_RSA_WITH_AES_256_CBC_SHA
+|     compressors: 
+|       NULL
+|     cipher preference: server
+|     warnings: 
+|       CBC-mode cipher in TLSv1.2 (CVE-2015-5242)
+|       Weak cipher: TLS_RSA_WITH_AES_128_CBC_SHA
+|       Weak cipher: TLS_RSA_WITH_AES_256_CBC_SHA
+|   TLSv1.3: 
+|     ciphers: 
+|       TLS_AKE_WITH_AES_128_GCM_SHA256
+|       TLS_AKE_WITH_AES_256_GCM_SHA384
+|       TLS_AKE_WITH_CHACHA20_POLY1305_SHA256
+|     cipher preference: server
+|_  least strength: B
+|_ssl-date: 2026-04-11T14:23:18+00:00; 0s from scanner time
+| ssl-heartbleed: 
+|   VULNERABLE:
+|   The Heartbleed Bug is a serious vulnerability in the OpenSSL cryptographic library.
+|     State: VULNERABLE (NOT exploitable with current OpenSSL version)
+|     Risk factor: High
+|_    CVE: CVE-2014-0160
+| http-security-headers: 
+|   Missing:
+|     Content-Security-Policy
+|_    X-Frame-Options
+| http-title: Welcome to MyApp Dashboard
+|_Requested resource was https://192.168.1.50/login
+|_http-waf-detect: not protected by a WAF
+3306/tcp open  mysql    MySQL 8.0.36
+| mysql-info: 
+|   Protocol: 10
+|   Version: 8.0.36
+|   Thread ID: 42
+|   Capabilities flags: 65535
+|   Some Capabilities: SupportsTransactions, SupportsCompression, LongColumnFlag, ConnectWithDatabase, Speaks41ProtocolNew, FoundRows, IgnoreSigpipes, Support41Auth
+|   Status: Autocommit
+|   Salt: jK8mN2pQ5rT9wX3yZ7aB1cD4fG6hJ0lM
+|_  Auth Plugin Name: caching_sha2_password
+| mysql-empty-password: 
+|_  Account root@192.168.1.50 has empty password
+| mysql-databases: 
+|   information_schema
+|   myapp_production
+|   myapp_staging
+|   performance_schema
+|_  sys
+8080/tcp open  http     Apache Tomcat 10.1.18
+| http-methods: 
+|_  Supported Methods: GET HEAD POST PUT DELETE OPTIONS
+| http-title: Apache Tomcat/10.1.18 - Manager App
+|_Requested resource was http://192.168.1.50:8080/
+| http-security-headers: 
+|   Missing:
+|     Strict-Transport-Security
+|     Content-Security-Policy
+|     X-Frame-Options
+|_    X-Content-Type-Options
+|_http-server-header: Apache-Coyote/1.1
+
+Device type: general purpose
+Running: Linux 5.X|6.X
+OS CPE: cpe:/o:linux:linux_kernel:5.15 cpe:/o:linux:linux_kernel:6.1
+OS details: Linux 5.15 - 6.1 (Ubuntu 22.04 / 24.04)
+Network Distance: 1 hop
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Apr 11 14:24:35 2026 -- 1 IP address (1 host up) scanned in 85.42 seconds

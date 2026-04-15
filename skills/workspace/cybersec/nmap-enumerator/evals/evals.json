@@ -1,0 +1,50 @@
+{
+  "skill_name": "nmap-enumerator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm doing a security assessment on a web app running at 192.168.1.50. I have written authorization from the client. Can you run an Nmap scan and give me the full enumeration report?",
+      "expected_output": "The skill should perform a two-phase Nmap scan: first a full-port discovery on 192.168.1.50, then an adaptive service scan focusing on HTTP/HTTPS-related NSE scripts if web ports are found. A markdown micro-report with embedded JSON should be generated in scans/report.md.",
+      "files": [],
+      "assertions": [
+        {"text": "has_authorization_check", "description": "Output mentions or acknowledges authorization before/during scanning"},
+        {"text": "has_two_phase_scan", "description": "Both Phase 1 (full-port -p-) and Phase 2 (targeted -sV) commands present"},
+        {"text": "has_adaptive_script_selection", "description": "NSE scripts are targeted based on discovered ports, not blanket --script all"},
+        {"text": "has_markdown_report", "description": "report.md exists with proper sections (ports, services, OS, NSE findings, notes)"},
+        {"text": "has_valid_json", "description": "Embedded JSON block is valid with required fields: target, open_ports, services, os, notes"},
+        {"text": "has_output_files", "description": "scans/ dir has both discovery and detailed outputs (.nmap, .xml, .gnmap)"},
+        {"text": "has_nse_findings", "description": "Report includes NSE-based discoveries (SSL grades, HTTP headers, security findings)"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Scan 10.0.0.25 — it's one of our staging servers in the lab environment. I need to know what's exposed. This is my own infrastructure.",
+      "expected_output": "The skill should confirm authorization, run full-port discovery on 10.0.0.25, then dynamically construct a targeted follow-up scan based on discovered services. A complete micro-report with open ports, services, OS, NSE findings, and security notes should be produced.",
+      "files": [],
+      "assertions": [
+        {"text": "has_authorization_check", "description": "Output mentions or acknowledges authorization before/during scanning"},
+        {"text": "has_two_phase_scan", "description": "Both Phase 1 (full-port -p-) and Phase 2 (targeted -sV) commands present"},
+        {"text": "has_adaptive_script_selection", "description": "NSE scripts are targeted based on discovered ports, not blanket --script all"},
+        {"text": "has_markdown_report", "description": "report.md exists with proper sections (ports, services, OS, NSE findings, notes)"},
+        {"text": "has_valid_json", "description": "Embedded JSON block is valid with required fields: target, open_ports, services, os, notes"},
+        {"text": "has_output_files", "description": "scans/ dir has both discovery and detailed outputs (.nmap, .xml, .gnmap)"},
+        {"text": "has_nse_findings", "description": "Report includes NSE-based discoveries (SSL grades, HTTP headers, security findings)"}
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Hey, I need to check what's open on scanme.nmap.org. It's a public test host. Run the full recon and give me the micro-report.",
+      "expected_output": "The skill should run the two-phase scan on scanme.nmap.org (a legitimate Nmap test target), discover the typical open ports (22, 80), run appropriate NSE scripts, and produce a structured markdown + JSON micro-report summarizing findings.",
+      "files": [],
+      "assertions": [
+        {"text": "has_authorization_check", "description": "Output mentions or acknowledges authorization before/during scanning"},
+        {"text": "has_two_phase_scan", "description": "Both Phase 1 (full-port -p-) and Phase 2 (targeted -sV) commands present"},
+        {"text": "has_adaptive_script_selection", "description": "NSE scripts are targeted based on discovered ports, not blanket --script all"},
+        {"text": "has_markdown_report", "description": "report.md exists with proper sections (ports, services, OS, NSE findings, notes)"},
+        {"text": "has_valid_json", "description": "Embedded JSON block is valid with required fields: target, open_ports, services, os, notes"},
+        {"text": "has_output_files", "description": "scans/ dir has both discovery and detailed outputs (.nmap, .xml, .gnmap)"},
+        {"text": "has_nse_findings", "description": "Report includes NSE-based discoveries (SSL grades, HTTP headers, security findings)"}
+      ]
+    }
+  ]
+}

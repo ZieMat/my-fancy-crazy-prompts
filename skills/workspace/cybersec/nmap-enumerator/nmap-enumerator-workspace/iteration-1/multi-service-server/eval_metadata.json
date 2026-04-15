@@ -1,0 +1,6 @@
+{
+  "eval_id": 2,
+  "eval_name": "multi-service-server",
+  "prompt": "Scan 10.0.0.25 — it's one of our staging servers in the lab environment. I need to know what's exposed. This is my own infrastructure.",
+  "assertions": []
+}
