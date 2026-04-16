@@ -1,4 +1,0 @@
-# Nmap 7.98 scan initiated Sat Apr 11 00:20:00 2026 as: nmap -sV -O --osscan-limit -p 22,80,443,3306,6379 --script ssh-auth-methods,ssh2-enum-algos,http-title,http-server-header,http-headers,http-methods,http-robots.txt,http-enum,http-security-headers,http-waf-detect,ssl-enum-ciphers,ssl-cert,ssl-heartbleed,ssl-date,mysql-info,mysql-empty-password,mysql-databases,redis-info --script-args safe=1 -oA scans/detailed 10.0.0.25
-Host: 10.0.0.25 (staging-web-01.lab.internal)	Status: Up
-Host: 10.0.0.25 (staging-web-01.lab.internal)	Ports: 22/open/tcp//ssh//OpenSSH 8.9p1 Ubuntu 3ubuntu0.6/, 80/open/tcp//http//nginx 1.24.0/, 443/open/tcp//ssl%2fhttp//nginx 1.24.0/, 3306/open/tcp//mysql//MySQL 8.0.36/, 6379/open/tcp//redis//Redis key-value store 7.2.4/	Ignored State: closed (0)
-# Nmap done at Sat Apr 11 00:21:05 2026 -- 1 IP address (1 host up) scanned in 65.12 seconds

@@ -1,6 +1,0 @@
-{
-  "eval_id": 1,
-  "eval_name": "web-app-assessment",
-  "prompt": "I'm doing a security assessment on a web app running at 192.168.1.50. I have written authorization from the client. Can you run an Nmap scan and give me the full enumeration report?",
-  "assertions": []
-}

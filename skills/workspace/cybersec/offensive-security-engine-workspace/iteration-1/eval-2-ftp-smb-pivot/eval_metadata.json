@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-2-ftp-smb-pivot",
+  "prompt": "Analyze the following Nmap output for 192.168.1.60. Port 21/tcp open ftp vsftpd 3.0.3. Port 445/tcp open microsoft-ds. No CVEs found for these versions. Execute Phase 2 strategy.",
+  "assertions": [
+    {
+      "name": "checks_misconfigurations",
+      "instruction": "Verify the agent attempts to check for anonymous FTP or SMB shares."
+    },
+    {
+      "name": "outputs_surface_map",
+      "instruction": "Verify the agent outputs a 'Target Surface Map' for further reconnaissance."
+    }
+  ]
+}

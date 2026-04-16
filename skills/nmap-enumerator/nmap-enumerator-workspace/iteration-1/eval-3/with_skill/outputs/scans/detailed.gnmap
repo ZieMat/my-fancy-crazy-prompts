@@ -1,4 +1,0 @@
-# Nmap 7.98 scan initiated Sat Apr 11 00:29:56 2026 as: /usr/lib/nmap/nmap --privileged -sV -O --osscan-limit -p 22,80,9929,31337 --script ssh-auth-methods,ssh2-enum-algos,http-title,http-server-header,http-headers,http-methods,http-robots.txt,http-enum,http-security-headers,http-waf-detect --script-args safe=1 --host-timeout 10m --script-timeout 5m -oA scans/detailed scanme.nmap.org
-Host: 45.33.32.156 (scanme.nmap.org)	Status: Up
-Host: 45.33.32.156 (scanme.nmap.org)	Ports: 22/open/tcp//tcpwrapped///, 80/open/tcp//http//Apache httpd 2.4.7 ((Ubuntu))/, 9929/open/tcp//nping-echo//Nping echo/, 31337/open/tcp//tcpwrapped///
-# Nmap done at Sat Apr 11 00:30:29 2026 -- 1 IP address (1 host up) scanned in 32.23 seconds

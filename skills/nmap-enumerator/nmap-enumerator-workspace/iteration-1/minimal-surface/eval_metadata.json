@@ -1,6 +1,0 @@
-{
-  "eval_id": 3,
-  "eval_name": "minimal-surface",
-  "prompt": "Hey, I need to check what's open on scanme.nmap.org. It's a public test host. Run the full recon and give me the micro-report.",
-  "assertions": []
-}

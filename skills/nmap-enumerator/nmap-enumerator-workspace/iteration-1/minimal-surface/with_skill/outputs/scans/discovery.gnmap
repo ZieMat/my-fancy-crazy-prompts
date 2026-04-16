@@ -1,4 +1,0 @@
-# Nmap 7.98 scan initiated Sat Apr 11 00:26:50 2026 as: /usr/lib/nmap/nmap --privileged -p- --open -T4 --min-rate 1000 -sT -Pn --host-timeout 10m -oA scans/discovery scanme.nmap.org
-Host: 45.33.32.156 (scanme.nmap.org)	Status: Up
-Host: 45.33.32.156 (scanme.nmap.org)	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 9929/open/tcp//nping-echo///, 31337/open/tcp//Elite///
-# Nmap done at Sat Apr 11 00:28:34 2026 -- 1 IP address (1 host up) scanned in 104.22 seconds
