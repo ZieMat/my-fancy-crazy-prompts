@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "skill_name": "nmap-enumerator",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-04-10T22:38:45Z",
+    "evals_run": [
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 0,
+      "result": {
+        "pass_rate": 0.8571,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 87.2,
+        "tokens": 12450,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has_authorization_check",
+          "passed": false,
+          "evidence": "No authorization check found"
+        },
+        {
+          "text": "has_two_phase_scan",
+          "passed": true,
+          "evidence": "Both -p- (full port) and -sV (version detection) flags found"
+        },
+        {
+          "text": "has_adaptive_script_selection",
+          "passed": true,
+          "evidence": "Found 15 specific NSE scripts: ssh-auth-methods, ssh2-enum-algos, http-title, http-server-header, http-headers..."
+        },
+        {
+          "text": "has_markdown_report",
+          "passed": true,
+          "evidence": "Found sections: open port, service, os detect, nse, note"
+        },
+        {
+          "text": "has_valid_json",
+          "passed": true,
+          "evidence": "Valid JSON with all required fields. 5 ports, 5 services"
+        },
+        {
+          "text": "has_output_files",
+          "passed": true,
+          "evidence": "All 6 output files present"
+        },
+        {
+          "text": "has_nse_findings",
+          "passed": true,
+          "evidence": "Found NSE-based findings: ssl_grade, cipher, heartbleed, http_title, security header"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 0,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 92.4,
+        "tokens": 13200,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has_authorization_check",
+          "passed": true,
+          "evidence": "Found authorization reference: 'authorized'"
+        },
+        {
+          "text": "has_two_phase_scan",
+          "passed": true,
+          "evidence": "Both -p- (full port) and -sV (version detection) flags found"
+        },
+        {
+          "text": "has_adaptive_script_selection",
+          "passed": true,
+          "evidence": "Found 16 specific NSE scripts: ssh-auth-methods, ssh2-enum-algos, http-title, http-server-header, http-headers..."
+        },
+        {
+          "text": "has_markdown_report",
+          "passed": true,
+          "evidence": "Found sections: open port, service, os detect, nse, note"
+        },
+        {
+          "text": "has_valid_json",
+          "passed": true,
+          "evidence": "Valid JSON with all required fields. 5 ports, 5 services"
+        },
+        {
+          "text": "has_output_files",
+          "passed": true,
+          "evidence": "All 6 output files present"
+        },
+        {
+          "text": "has_nse_findings",
+          "passed": true,
+          "evidence": "Found NSE-based findings: ssl_grade, cipher, heartbleed, http_title, security header"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 0,
+      "result": {
+        "pass_rate": 0.8571,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "time_seconds": 145.0,
+        "tokens": 11800,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "has_authorization_check",
+          "passed": false,
+          "evidence": "No authorization check found"
+        },
+        {
+          "text": "has_two_phase_scan",
+          "passed": true,
+          "evidence": "Both -p- (full port) and -sV (version detection) flags found"
+        },
+        {
+          "text": "has_adaptive_script_selection",
+          "passed": true,
+          "evidence": "Found 10 specific NSE scripts: ssh-auth-methods, ssh2-enum-algos, http-title, http-server-header, http-headers..."
+        },
+        {
+          "text": "has_markdown_report",
+          "passed": true,
+          "evidence": "Found sections: open port, service, os detect, nse, note"
+        },
+        {
+          "text": "has_valid_json",
+          "passed": true,
+          "evidence": "Valid JSON with all required fields. 4 ports, 4 services"
+        },
+        {
+          "text": "has_output_files",
+          "passed": true,
+          "evidence": "All 6 output files present"
+        },
+        {
+          "text": "has_nse_findings",
+          "passed": true,
+          "evidence": "Found NSE-based findings: cipher, http_title, security header, robots, enum"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9047,
+        "stddev": 0.0825,
+        "min": 0.8571,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 108.2,
+        "stddev": 31.9756,
+        "min": 87.2,
+        "max": 145.0
+      },
+      "tokens": {
+        "mean": 12483.3333,
+        "stddev": 700.595,
+        "min": 11800,
+        "max": 13200
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.90",
+      "time_seconds": "+108.2",
+      "tokens": "+12483"
+    }
+  },
+  "notes": []
+}

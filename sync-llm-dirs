@@ -1,0 +1,128 @@
+#!/bin/bash
+
+# Sync script between my-fancy-crazy-prompts and my-llm-stuff
+# Ensures both directories stay synchronized with proper git operations
+
+set -e
+
+# Source and destination directories (hardcoded for this script location)
+SRC_DIR="/home/zieloma4/my-fancy-crazy-prompts"
+DEST_DIR="/home/zieloma4/my-llm-stuff"
+
+# Hardcoded directories/files to ignore (git-related)
+IGNORE_PATTERS=(
+    ".git"
+    ".gitignore"
+    "skills-lock.json"
+    ".qwen"
+)
+
+# Build exclude arguments for rsync
+build_excludes() {
+    local excludes=()
+    for pattern in "${IGNORE_PATTERS[@]}"; do
+        excludes+=(--exclude="$pattern")
+    done
+    echo "${excludes[@]}"
+}
+
+# Get directory age based on newest file modification time (excluding .git)
+get_dir_age() {
+    local dir="$1"
+    if [[ -d "$dir" ]]; then
+        find "$dir" -type f -not -path "*/.git/*" -printf '%T@\n' 2>/dev/null | sort -rn | head -n1
+    else
+        echo "0"
+    fi
+}
+
+# Check if git repo has uncommitted changes
+has_uncommitted_changes() {
+    local dir="$1"
+    cd "$dir"
+    git status --porcelain | grep -q . 2>/dev/null
+}
+
+# Commit and push changes in a directory
+commit_and_push() {
+    local dir="$1"
+    local repo_name="$2"
+    
+    echo "Committing and pushing changes to $repo_name..."
+    cd "$dir"
+    
+    # Always add all files (including new/untracked ones)
+    git add .
+    
+    # Check if there are any changes to commit after adding
+    if git diff-index --quiet HEAD -- 2>/dev/null; then
+        echo "No changes to commit in $repo_name"
+        return 0
+    fi
+    
+    git commit -m "sync"
+    git push
+    echo "Git operations completed for $repo_name!"
+}
+
+# Main sync logic
+main() {
+    # Check if directories exist
+    if [[ ! -d "$SRC_DIR" ]]; then
+        echo "Error: Source directory $SRC_DIR does not exist"
+        exit 1
+    fi
+
+    if [[ ! -d "$DEST_DIR" ]]; then
+        echo "Error: Destination directory $DEST_DIR does not exist"
+        exit 1
+    fi
+
+    # Build exclude arguments
+    local excludes=$(build_excludes)
+
+    # Step 1: Check if my-fancy-crazy-prompts has remote changes
+    echo "Checking for updates in my-fancy-crazy-prompts..."
+    cd "$SRC_DIR"
+    git fetch origin main 2>/dev/null || git fetch origin master 2>/dev/null
+    
+    # Check if fetch actually updated anything
+    local local_hash=$(git rev-parse HEAD)
+    local remote_hash=$(git rev-parse origin/main 2>/dev/null || git rev-parse origin/master 2>/dev/null)
+    
+    if [[ "$local_hash" != "$remote_hash" ]]; then
+        echo "Changes detected in my-fancy-crazy-prompts. Pulling updates..."
+        git pull origin main
+        
+        # Step 2a: There were changes in SRC, sync to DEST
+        echo "Syncing from my-fancy-crazy-prompts to my-llm-stuff..."
+        rsync -av $excludes "$SRC_DIR/" "$DEST_DIR/"
+        
+        # Step 3a: Commit and push to DEST (my-llm-stuff)
+        commit_and_push "$DEST_DIR" "my-llm-stuff"
+        
+        # Also commit and push to SRC (my-fancy-crazy-prompts) to ensure both are synced
+        commit_and_push "$SRC_DIR" "my-fancy-crazy-prompts"
+    else
+        echo "No changes in my-fancy-crazy-prompts remote."
+        
+        # Step 2b: No changes in SRC, check if DEST has local changes
+        local src_age=$(get_dir_age "$SRC_DIR")
+        local dest_age=$(get_dir_age "$DEST_DIR")
+        
+        if (( $(echo "$dest_age > $src_age" | bc -l) )); then
+            echo "my-llm-stuff has newer changes. Syncing to my-fancy-crazy-prompts..."
+            rsync -av $excludes "$DEST_DIR/" "$SRC_DIR/"
+            
+            # Step 3b: Commit and push both directories
+            commit_and_push "$SRC_DIR" "my-fancy-crazy-prompts"
+            commit_and_push "$DEST_DIR" "my-llm-stuff"
+        else
+            echo "Both directories are in sync. No action needed."
+        fi
+    fi
+
+    echo "Sync completed successfully!"
+}
+
+main "$@"
