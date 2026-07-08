@@ -2,7 +2,7 @@
 
 **THE ULTIMATE SETUP FOR MAX CONTEXT, MODULARITY & AUTONOMY**
 
-*Updated for 2026 - Optimized for Grok & xAI*
+*Updated for 2026 — native Grok Build paths*
 
 ## WHAT IS THIS?
 
@@ -20,107 +20,115 @@ A production-grade Grok Build setup that gives you:
 ```
 final-boss-grok-project/
 ├── README.md
-├── GROK.md
-├── GROK.local.md
-├── AGENTS.md
-├── .grok.json
-├── .worktreeinclude
+├── AGENTS.md                          # main project instructions (~200 lines max)
 ├── .grok/
-│   ├── settings.json
-│   └── settings.local.json
-├── rules/
-│   ├── testing.md
-│   ├── api-design.md
-│   └── frontend/
-│       └── react.md
-├── skills/
-│   ├── security-review/
-│   │   ├── SKILL.md
-│   │   └── checklist.md
-│   ├── deploy/
-│   │   └── SKILL.md
-│   └── release/
-│       ├── SKILL.md
-│       └── changelog.tmpl
-├── agents/
-│   ├── code-reviewer.md
-│   ├── debugger.md
-│   └── db-validator.md
-├── workflows/
-│   └── release-train.js
-├── agent-memory/
-│   └── debugger/
-│       └── MEMORY.md
-├── hooks/
-│   ├── format.sh
-│   └── protect.sh
-├── observability/
-│   └── usage-metrics.md
-├── output-styles/
-│   └── review-mode.md
+│   ├── config.toml                    # project MCP, permissions, plugins
+│   ├── skills/
+│   │   ├── security-review/
+│   │   │   ├── SKILL.md
+│   │   │   └── checklist.md
+│   │   ├── deploy/
+│   │   │   └── SKILL.md
+│   │   └── release/
+│   │       ├── SKILL.md
+│   │       └── changelog.tmpl
+│   ├── agents/
+│   │   ├── code-reviewer.md
+│   │   ├── debugger.md
+│   │   └── db-validator.md
+│   ├── hooks/
+│   │   ├── format.json                # → scripts/format.sh
+│   │   └── protect.json               # → scripts/protect.sh
+│   ├── rules/
+│   │   ├── testing.md
+│   │   ├── api-design.md
+│   │   └── frontend/
+│   │       └── react.md
+│   ├── personas/                      # optional behavioral overlays
+│   └── roles/                         # optional subagent role defaults
 ├── docs/
 │   ├── architecture.md
 │   └── decisions/
 ├── src/
 │   ├── api/
-│   │   └── GROK.md
+│   │   └── AGENTS.md                  # scoped rules for API package
 │   └── payments/
-│       └── GROK.md
+│       └── AGENTS.md                  # scoped rules for payments package
 └── tools/
     ├── scripts/
+    │   ├── format.sh
+    │   └── protect.sh
     └── prompts/
 ```
 
+> **Verify after setup:** run `grok inspect` in the project root to confirm Grok discovers your rules, skills, agents, hooks, and MCP servers.
+
 ## THE CONTEXT LADDER
 
-1. **EVERY SESSION** → GROK.md + rules/ (no paths)
-2. **PATH-GATED** → rules/*.md with paths (lazy load)
-3. **ON INVOKE** → skills/* via /name (on demand)
-4. **ISOLATED** → agents/ & workflows/ (own context)
+1. **EVERY SESSION** → `AGENTS.md` + `.grok/rules/` (loaded from repo root to CWD)
+2. **SUBDIRECTORY SCOPE** → nested `AGENTS.md` files (loaded when working in that tree)
+3. **ON INVOKE** → `.grok/skills/*` via `/name` (on demand)
+4. **ISOLATED** → `.grok/agents/` subagents (own context window; optional `isolation: worktree`)
 
 ## GUIDANCE vs ENFORCEMENT
 
-**GROK.md / rules = ASKED**
+**AGENTS.md / .grok/rules/ = ASKED**
 Instructions Grok reads and usually follows. Conventions, commands, architecture context.
 
 **VS**
 
-**settings + hooks = FORCED**
-permissions.deny blocks dangerous commands. Pre/PostToolUse formats every edit. Scripts wired in settings.json guard before & after every tool use.
+**config.toml + hooks = FORCED**
+`[permission]` deny rules block dangerous commands. `PreToolUse` / `PostToolUse` hooks in `.grok/hooks/*.json` guard before and after every tool use.
 
 ## THE AGENT LAYER
 
-- **SUBAGENTS**: agents/*.md – Own prompt, tools, model & memory
-- **WORKFLOWS**: workflows/*.js – Orchestrate many subagents from one command
-- **WORKTREES**: .worktreeinclude – Parallel agents on isolated checkouts with full .env
+- **SUBAGENTS**: `.grok/agents/*.md` — own prompt, tools, model; spawn via `spawn_subagent` or bundled skills like `/review`
+- **SKILLS**: `.grok/skills/*/SKILL.md` — repeatable workflows invoked as `/skill-name`
+- **WORKTREES**: subagent `isolation: worktree`, or `/new` / `/fork --worktree` for parallel isolated sessions
 
 ## AUTO MEMORY
 
-Grok writes, you commit. Persists across sessions in agent-memory/ and ~/.grok/projects/
+Enable cross-session memory with `GROK_MEMORY=1` or `[memory] enabled = true` in `~/.grok/config.toml`.
+
+Grok stores memory in `~/.grok/memory/` (global + per-workspace). Use `/remember`, `/flush`, and `/memory` — not a repo-local `agent-memory/` folder.
 
 ## HOOKS
 
-Scripts wired in .grok/settings.json. Guardrails before & after every tool use. Integrated with Git hooks for team consistency.
+Hook definitions live in `.grok/hooks/*.json`. Each JSON file wires shell scripts (e.g. `tools/scripts/format.sh`) to lifecycle events (`PreToolUse`, `PostToolUse`, `SessionStart`).
+
+Project hooks require folder trust (`/hooks-trust` or `--trust` on first run).
 
 ## GOLDEN RULES
 
-- 📄 KEEP GROK.md UNDER ~200 LINES. Split into rules/ when it grows.
-- ▶️ LIST REAL COMMANDS (npm test, build, lint) so Grok can verify its own work.
-- 🔒 SECRETS STAY IN $ENV_VAR REFERENCES. Never in .grok.json literally.
-- 🔗 COMMIT .grok/ + .gitignore *.local.* Your setup is team infrastructure.
-- 🔍 RESEARCH → SUBAGENT PROCEDURE + SKILL GUARANTEE + HOOK
-- ⚖️ TRUTH & HELPFULNESS FIRST – Grok native strength: always prioritize accuracy and maximum usefulness.
+- 📄 KEEP `AGENTS.md` UNDER ~200 LINES. Split into `.grok/rules/` when it grows.
+- ▶️ LIST REAL COMMANDS (`npm test`, `build`, `lint`) so Grok can verify its own work.
+- 🔒 SECRETS STAY IN `$ENV_VAR` REFERENCES. Never commit literals in `config.toml`.
+- 🔗 COMMIT `.grok/` — your setup is team infrastructure.
+- 🔍 RESEARCH → SUBAGENT (`explore` type) + SKILL + HOOK
+- ⚖️ TRUTH & HELPFULNESS FIRST — Grok native strength: always prioritize accuracy and maximum usefulness.
 
-## QUICK START & IMPROVEMENTS INCORPORATED
+## QUICK START
 
-1. Copy structure to your project root.
-2. Customize GROK.md and rules/ for your conventions.
-3. Add your project-specific agents in agents/.
-4. Use observability/ to track token usage and agent performance.
-5. When starting session with Grok, reference AGENTS.md and relevant rules.
+1. Copy the structure to your project root.
+2. Customize `AGENTS.md` and `.grok/rules/` for your conventions.
+3. Add project-specific subagents in `.grok/agents/`.
+4. Wire guardrails in `.grok/hooks/` and permissions in `.grok/config.toml`.
+5. Run `grok inspect` to confirm everything loads.
 
-This template incorporates all improvements from the original Claude Code evaluation: central README, standardized skill/agent formats, explicit CI/Git integration examples, and team-ready .gitignore rules.
+## MIGRATION FROM CLAUDE CODE FINAL BOSS
+
+| Old (Claude-style) | Grok Build native |
+|--------------------|-------------------|
+| `GROK.md` / `CLAUDE.md` | `AGENTS.md` |
+| `rules/` (repo root) | `.grok/rules/` |
+| `skills/` (repo root) | `.grok/skills/` |
+| `agents/` (repo root) | `.grok/agents/` |
+| `hooks/*.sh` (repo root) | `.grok/hooks/*.json` → `tools/scripts/*.sh` |
+| `.grok/settings.json` | `.grok/config.toml` (+ `~/.grok/config.toml` for global settings) |
+| `agent-memory/` | `~/.grok/memory/` (built-in) |
+| `workflows/*.js` | skills (`/release`) or `/execute-plan` |
+| `.worktreeinclude` | subagent `isolation: worktree` |
 
 ---
 
-*Inspired by the legendary Claude Code Final Boss setup. Adapted and enhanced for Grok's strengths in tool-use, real-time reasoning and creative problem solving.*
+*Inspired by the legendary Claude Code Final Boss setup. Adapted for Grok Build's native discovery paths, subagents, skills, hooks, and cross-session memory.*
