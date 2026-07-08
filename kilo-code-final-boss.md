@@ -1,150 +1,207 @@
-# Kilo Code Final Boss Project Structure
+# Kilo Code Final Boss → Grok Build
 
-**THE ULTIMATE SETUP FOR MAX CONTEXT, MODULARITY & AUTONOMY WITH KILO CODE**
+**THE ULTIMATE SETUP FOR MAX CONTEXT, MODULARITY & AUTONOMY**
 
-*Updated for 2026 – Custom Rules, Agent Modes, Multi-Model Routing, AGENTS.md First*
+*Updated for 2026 — adapted from Kilo Code Final Boss to native Grok Build paths*
+
+> This template originated as a Kilo Code setup. The structure below is remapped to what Grok Build actually discovers and loads at runtime. Use `grok inspect` to verify.
 
 ## WHAT IS THIS?
 
-A production-grade Kilo Code setup that gives you:
+A production-grade Grok Build setup that gives you:
 
-- Persistent project context via AGENTS.md (core of Kilo)
-- Custom rules scanned from `kilo code/rules/`
-- Built-in Agent Modes (Architect/Plan, Code, Debug, Ask, Custom)
-- Intelligent multi-model routing (Grok, Claude, local models...)
-- Lower context cost, modular prompts, automated guardrails, multi-agent orchestration
+- Persistent project context via `AGENTS.md`
+- Modular rules in `.grok/rules/`
+- Plan mode + specialized subagents (architect, debug, explore)
+- Per-subagent model routing in `config.toml`
+- Lower context cost, automated guardrails, multi-agent orchestration
 
-## FOLDER STRUCTURE (KILO NATIVE)
+## FOLDER STRUCTURE
 
 ```
-final-boss-kilo-project/
+final-boss-grok-project/
 ├── README.md
-├── AGENTS.md                 # Main persistent context (Kilo loads this first)
-├── KILO.md                  # Additional Kilo-specific instructions
-├── kilo code/               # Scanned by Kilo Code for custom configs
-│   └── rules/
-│       ├── coding-standards.md
-│       ├── testing.md
-│       ├── architecture.md
-│       └── security.md
-├── skills/
-│   ├── security-review/
-│   │   └── SKILL.md
-│   └── deploy/
-│       └── SKILL.md
-├── agents/
-│   ├── architect.md
-│   ├── debugger.md
-│   └── reviewer.md
-├── workflows/
-│   └── release-train.js
-├── agent-memory/
-│   └── default/
-│       └── MEMORY.md
-├── hooks/
-│   ├── pre-task.sh
-│   └── post-edit.sh
-├── observability/
-│   └── usage-metrics.md
+├── AGENTS.md                          # main project instructions (~200 lines max)
+├── .grok/
+│   ├── config.toml                    # MCP, permissions, subagent model routing
+│   ├── skills/
+│   │   ├── security-review/
+│   │   │   ├── SKILL.md
+│   │   │   └── checklist.md
+│   │   └── deploy/
+│   │       └── SKILL.md
+│   ├── agents/
+│   │   ├── architect.md               # planning / design subagent
+│   │   ├── debugger.md                # root-cause analysis subagent
+│   │   └── reviewer.md                # code review subagent
+│   ├── hooks/
+│   │   ├── pre-task.json              # → tools/scripts/pre-task.sh
+│   │   └── post-edit.json             # → tools/scripts/post-edit.sh
+│   ├── rules/
+│   │   ├── coding-standards.md
+│   │   ├── testing.md
+│   │   ├── architecture.md
+│   │   └── security.md
+│   ├── personas/                      # optional behavioral overlays
+│   └── roles/                         # optional subagent role defaults
 ├── docs/
 │   ├── architecture.md
 │   └── decisions/
-└── src/
-    └── ... (your code with optional local KILO.md)
+├── src/
+│   └── ...                            # optional per-package AGENTS.md
+└── tools/
+    ├── scripts/
+    │   ├── pre-task.sh
+    │   └── post-edit.sh
+    └── prompts/
 ```
 
-## THE CONTEXT LADDER (KILO ADAPTED)
+> **Verify after setup:** `grok inspect` in the project root.
 
-1. **EVERY SESSION** → AGENTS.md + kilo code/rules/ (Kilo auto-loads)
-2. **PATH-GATED** → kilo code/rules/*.md with paths (lazy loaded per task)
-3. **ON INVOKE** → skills/* or custom agent modes (on demand)
-4. **ISOLATED** → agents/ & workflows/ (dedicated context per mode)
+## ANALYSIS: WHAT DID NOT WORK (KILO ORIGINAL)
+
+| Kilo Code element | Grok Build verdict |
+|-------------------|--------------------|
+| `KILO.md` | ❌ Not a recognized instruction file — use `AGENTS.md` |
+| `kilo code/rules/` | ❌ Not scanned — use `.grok/rules/` |
+| `skills/` (repo root) | ❌ Not discovered — use `.grok/skills/` |
+| `agents/` (repo root) | ❌ Not discovered — use `.grok/agents/` |
+| `hooks/*.sh` (repo root) | ❌ Hooks need `.grok/hooks/*.json` definitions |
+| `agent-memory/` | ❌ Use built-in `~/.grok/memory/` + `/remember` |
+| `workflows/*.js` | ❌ Use skills (`/release`) or `/execute-plan` |
+| `observability/` | ⚠️ Manual notes only — use `/context` and `grok inspect` |
+| Path-gated lazy rules | ⚠️ Partial — nested `AGENTS.md` loads on demand; `.grok/rules/` loads from root→CWD |
+| Built-in Kilo modes UI | ⚠️ No 1:1 UI — mapped to Plan mode + subagent types (see below) |
+| Multi-model per rule file | ⚠️ No per-rule model field — use `config.toml`, agent defs, skill frontmatter |
+
+## THE CONTEXT LADDER
+
+1. **EVERY SESSION** → `AGENTS.md` + `.grok/rules/` (loaded from repo root to CWD)
+2. **SUBDIRECTORY SCOPE** → nested `AGENTS.md` files (loaded when working in that tree)
+3. **ON INVOKE** → `.grok/skills/*` via `/name` (on demand)
+4. **ISOLATED** → `.grok/agents/` subagents (own context; optional `isolation: worktree`)
+
+## KILO MODES → GROK BUILD EQUIVALENTS
+
+| Kilo Code mode | Grok Build equivalent |
+|----------------|----------------------|
+| Architect / Plan | Plan mode (`/plan`, `enter_plan_mode`) or `plan` subagent |
+| Code | Default Grok Build session |
+| Debug | `.grok/agents/debugger.md` subagent |
+| Ask / Explore | `explore` subagent (`capability_mode: read-only`) |
+| Custom | `.grok/agents/*.md` or `.grok/roles/*.toml` |
+
+## MODEL ROUTING
+
+Grok Build routes models via `config.toml`, agent definitions, and skill frontmatter — not via markdown rule files.
+
+```toml
+# ~/.grok/config.toml or project overrides where supported
+[subagents.models]
+explore = "grok-build"          # fast research
+plan = "grok-build"              # deep planning
+
+[subagents.toggle]
+plan = true
+explore = true
+```
+
+Per-agent override in `.grok/agents/architect.md` frontmatter:
+
+```yaml
+---
+model: grok-build
+description: Design before coding
+tools:
+  - read_file
+  - grep_search
+  - list_dir
+disallowedTools:
+  - search_replace
+---
+```
+
+Per-skill override in `SKILL.md` frontmatter: `model: grok-build`.
 
 ## GUIDANCE vs ENFORCEMENT
 
-**AGENTS.md / kilo code/rules/ = ASKED**
-Kilo loads these markdown files and follows your project standards, coding conventions and architecture decisions.
+**AGENTS.md / .grok/rules/ = ASKED**
+Instructions Grok reads and usually follows.
 
 **VS**
 
-**Kilo Settings + local hooks = FORCED**
-Use Kilo's built-in guardrails + local pre/post scripts to enforce formatting, security scans and dangerous command blocks regardless of model output.
-
-## THE AGENT LAYER & MODES
-
-Kilo ships with powerful built-in modes – use them!
-
-- **Architect / Plan mode**: Design before coding (highly recommended for complex tasks)
-- **Code mode**: Implementation and editing
-- **Debug mode**: Root cause analysis and fixes
-- **Ask mode**: Questions and exploration
-- **Custom modes**: Defined in rules/ or AGENTS.md
-
-**SUBAGENTS**: Extend with agents/*.md for specialized roles (reviewer, db-expert...)
-**WORKFLOWS**: Orchestrate multi-mode or multi-model flows
-
-## MODEL ROUTING (KILO SUPERPOWER)
-
-- Grok → Fast iteration, creative solutions, tool-use heavy tasks
-- Claude → Deep reasoning, complex architecture, high precision
-- Local / cheaper models → Simple refactors and boilerplate
-- Document preferred model per rule/skill in kilo code/rules/
+**config.toml + hooks = FORCED**
+`[permission]` deny rules block dangerous commands. `PreToolUse` / `PostToolUse` hooks guard every tool use.
 
 ## AUTO MEMORY
 
-Kilo maintains context across interactions. Commit updates to AGENTS.md and agent-memory/. Use for long-running projects.
+Enable with `GROK_MEMORY=1` or `[memory] enabled = true` in `~/.grok/config.toml`.
 
-## HOOKS & OBSERVABILITY
+Use `/remember`, `/flush`, `/memory` — not a repo-local `agent-memory/` folder. Update `AGENTS.md` for durable team conventions.
 
-Local hooks in hooks/ run before/after Kilo actions. Track token usage, mode switches and model costs in observability/.
+## HOOKS
 
-## GOLDEN RULES (KILO EDITION)
+Definitions in `.grok/hooks/*.json` pointing to `tools/scripts/*.sh`. Project hooks require `/hooks-trust` or `--trust`.
 
-- 📄 KEEP AGENTS.md UNDER ~300 LINES. This is Kilo's primary context source – keep it focused.
-- 🚀 ALWAYS START COMPLEX TASKS IN ARCHITECT MODE
-- ▶️ LIST REAL COMMANDS & TEST COMMANDS so Kilo can self-verify
-- 🔒 SECRETS IN ENV VARS ONLY
-- 🔗 COMMIT `kilo code/` and AGENTS.md – team infrastructure
-- 🔍 USE THE RIGHT MODE + RIGHT MODEL for every subtask
-- ⚖️ TRUTH FIRST – even when switching models, demand accuracy
+## GOLDEN RULES
+
+- 📄 KEEP `AGENTS.md` UNDER ~200 LINES. Split into `.grok/rules/` when it grows.
+- 🚀 START COMPLEX TASKS IN PLAN MODE (`/plan`) before multi-file implementation
+- ▶️ LIST REAL COMMANDS (`npm test`, `build`, `lint`) so Grok can self-verify
+- 🔒 SECRETS IN `$ENV_VAR` ONLY — never commit literals in `config.toml`
+- 🔗 COMMIT `.grok/` + `AGENTS.md` — team infrastructure
+- 🔍 RESEARCH → `explore` subagent; IMPLEMENT → default session; REVIEW → `/review` or reviewer agent
+- ⚖️ TRUTH FIRST — prioritize accuracy over speed
 
 ## QUICK START
 
-1. Add the folder structure to your project.
-2. Write your project standards, tech decisions and coding rules into **AGENTS.md**.
-3. Create reusable rules in `kilo code/rules/` (Kilo will discover them).
-4. In Kilo Code IDE/CLI switch to **Architect** mode for planning, then **Code** mode for implementation.
-5. Customize model routing in your rules files.
-6. Use observability/ to monitor and improve your agentic workflow.
+1. Copy the structure to your project root.
+2. Write standards and tech decisions into `AGENTS.md`.
+3. Add reusable rules in `.grok/rules/`.
+4. For complex features: `/plan` first, then implement in the main session.
+5. Configure model routing in `config.toml` and agent/skill frontmatter.
+6. Run `grok inspect` to confirm discovery.
 
-All previous improvements from Claude Code evaluation are included: central README, standardized SKILL.md format, explicit Git/CI hooks, team sharing rules, and observability.
+## MIGRATION FROM KILO CODE FINAL BOSS
 
----
+| Kilo Code | Grok Build native |
+|-----------|-------------------|
+| `KILO.md` | `AGENTS.md` (merge content) |
+| `kilo code/rules/` | `.grok/rules/` |
+| `skills/` (root) | `.grok/skills/` |
+| `agents/` (root) | `.grok/agents/` |
+| `hooks/*.sh` | `.grok/hooks/*.json` → `tools/scripts/*.sh` |
+| `agent-memory/` | `~/.grok/memory/` |
+| `workflows/*.js` | skills or `/execute-plan` |
+| `observability/` | `/context`, `grok inspect` |
+| Kilo Architect mode | `/plan` or `plan` subagent |
+| Kilo Debug mode | `debugger` subagent in `.grok/agents/` |
+| Model per rule file | `[subagents.models]` + agent/skill `model:` |
 
-*Adapted from the Claude Code Final Boss and Grok Build templates. Tailored specifically for Kilo Code's unique strengths: open multi-model support, built-in agent personas, and powerful custom rules system.*
-
-## SAMPLE AGENTS.md (copy & customize)
+## SAMPLE AGENTS.md
 
 ```markdown
-# Project AGENTS.md for Kilo Code
+# Project AGENTS.md
 
 You are an expert software engineer working in this project.
 
 ## Core Principles
-- Always use Architect mode for new features or refactors > 3 files
-- Follow the rules in kilo code/rules/
-- Prefer Grok for speed, Claude for complex logic
+- Use `/plan` for new features or refactors touching > 3 files
+- Follow rules in `.grok/rules/`
+- Research with `explore` subagent; implement in main session
 - Write self-documenting code
 - Run tests before committing
 
 ## Tech Stack
 - ...
 
-## Coding Standards
-- ...
+## Commands
+- Test: `npm test`
+- Lint: `npm run lint`
+- Build: `npm run build`
 ```
 
-## SAMPLE RULE (kilo code/rules/coding-standards.md)
+## SAMPLE RULE (.grok/rules/coding-standards.md)
 
 ```markdown
 # Coding Standards
@@ -154,3 +211,7 @@ You are an expert software engineer working in this project.
 - All public functions must have JSDoc
 - Error handling: never swallow errors
 ```
+
+---
+
+*Adapted from the Kilo Code Final Boss and Claude Code Final Boss templates. Remapped to Grok Build's native discovery paths, Plan mode, subagents, skills, hooks, and cross-session memory.*
