@@ -1,0 +1,19 @@
+---
+name: deploy
+description: Deploy the application using project conventions. Use when the user asks to deploy, ship, or run /deploy.
+---
+
+# Deploy
+
+Deploy using the project's standard pipeline.
+
+## Steps
+
+1. Run `{{TEST_CMD}}` — abort if tests fail
+2. Run `{{BUILD_CMD}}` — abort if build fails
+3. Confirm target environment with the user (staging vs production)
+4. Execute the deploy command for this stack: `{{DEPLOY_CMD}}`
+5. Run a smoke check after deploy
+6. Report deployment status and any rollback steps
+
+Never deploy with failing tests unless the user explicitly overrides.

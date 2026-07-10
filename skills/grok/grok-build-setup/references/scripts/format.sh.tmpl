@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# PostToolUse formatter — customize FORMAT_CMD for your stack
+# Default: no-op if FORMAT_CMD is unset
+if [ -n "$FORMAT_CMD" ]; then
+  sh -c "$FORMAT_CMD" 2>/dev/null || true
+fi
+exit 0

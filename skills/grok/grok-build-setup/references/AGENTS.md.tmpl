@@ -1,0 +1,37 @@
+# {{PROJECT_NAME}}
+
+{{PROJECT_DESCRIPTION}}
+
+## Core Principles
+
+- Follow rules in `.grok/rules/` for detailed conventions
+- Run tests before committing; use real commands listed below
+- Research with the `explore` subagent; implement in the main session
+- Use `/plan` or plan mode for features touching more than 3 files
+- Never commit secrets — use environment variables only
+
+## Tech Stack
+
+- Language/runtime: {{STACK}}
+- Package manager: {{PACKAGE_MANAGER}}
+- Framework: {{FRAMEWORK}}
+
+## Commands
+
+| Task | Command |
+|------|---------|
+| Test | `{{TEST_CMD}}` |
+| Lint | `{{LINT_CMD}}` |
+| Build | `{{BUILD_CMD}}` |
+| Format | `{{FORMAT_CMD}}` |
+
+## Architecture
+
+- High-level design: `docs/architecture.md`
+- Decisions log: `docs/decisions/`
+- API conventions: `.grok/rules/api-design.md`
+- Testing policy: `.grok/rules/testing.md`
+
+## Grok Build Layout
+
+This project uses the Final Boss structure under `.grok/`. Run `grok inspect` to verify discovery.

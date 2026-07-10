@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+# PreToolUse guard — blocks destructive shell patterns
+INPUT=$(cat)
+CMD=$(echo "$INPUT" | jq -r '.toolInput.command // empty' 2>/dev/null)
+
+if echo "$CMD" | grep -qE '(rm -rf[[:space:]]+/|rm -rf[[:space:]]+/*|mkfs|dd if=|:(){ :|:& };:)'; then
+  echo '{"decision": "deny", "reason": "Blocked potentially destructive command"}'
+  exit 2
+fi
+
+echo '{"decision": "allow"}'
+exit 0

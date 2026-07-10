@@ -1,0 +1,17 @@
+# Project-scoped Grok Build config
+# Only [mcp_servers], [plugins], and [permission] load from project .grok/config.toml
+# Global settings live in ~/.grok/config.toml
+
+[permission]
+deny = [
+  'bash(rm -rf *)',
+  'bash(sudo *)',
+  'bash(curl * | sh)',
+  'bash(wget * | sh)',
+]
+
+# Example MCP server — uncomment and set env vars before use
+# [mcp_servers.github]
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-github"]
+# env = { GITHUB_PERSONAL_ACCESS_TOKEN = "$GITHUB_TOKEN" }

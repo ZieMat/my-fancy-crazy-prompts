@@ -1,0 +1,21 @@
+---
+name: security-review
+description: Run a security-focused review of changed code. Use when the user asks for security review, threat check, or /security-review.
+---
+
+# Security Review
+
+Review recent changes for security issues.
+
+## Steps
+
+1. Identify changed files (`git diff`, `git status`, or user-provided paths)
+2. Read each file and check the checklist in `checklist.md`
+3. Report findings by severity: critical, high, medium, low
+4. Do not fix issues unless the user asks — review first
+
+## Output format
+
+- Summary verdict: pass / pass-with-notes / fail
+- Numbered findings with file:line references
+- Remediation suggestion per finding

@@ -1,0 +1,10 @@
+# Security Review Checklist
+
+- [ ] No hardcoded secrets, tokens, or API keys
+- [ ] Input validated at trust boundaries
+- [ ] SQL/NoSQL queries parameterized (no string concatenation)
+- [ ] Auth checks on protected routes and mutations
+- [ ] Dependencies without known critical CVEs (if lockfile present)
+- [ ] Sensitive paths not exposed in logs or error messages
+- [ ] File uploads restricted by type and size
+- [ ] CORS and cookie flags appropriate for production
